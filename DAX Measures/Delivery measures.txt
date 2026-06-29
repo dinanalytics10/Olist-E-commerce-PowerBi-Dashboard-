@@ -1,0 +1,50 @@
+delay_days = 
+DATEDIFF(
+    olist_orders_dataset[order_estimated_delivery_date],
+    olist_orders_dataset[order_delivered_customer_date],
+    DAY
+)
+
+Delivery Delay Bucket = 
+SWITCH(TRUE(),
+    olist_orders_dataset[delay_days] <= -7, 
+        "7+ Days Early",
+    olist_orders_dataset[delay_days] <= 0, 
+        "On Time / Early",
+    olist_orders_dataset[delay_days] <= 3, 
+        "1-3 Days Late",
+    olist_orders_dataset[delay_days] <= 7, 
+        "4-7 Days Late",
+    olist_orders_dataset[delay_days] <= 14, 
+        "8-14 Days Late",
+    "14+ Days Late"
+)
+
+On Time Rate = 
+DIVIDE(
+    COUNTROWS(FILTER(olist_orders_dataset,
+        olist_orders_dataset[order_delivered_customer_date]
+        <= olist_orders_dataset[order_estimated_delivery_date]
+    )),
+    COUNTROWS(olist_orders_dataset)
+) * 100
+
+Avg Delivery Days = 
+AVERAGEX(
+    olist_orders_dataset,
+    DATEDIFF(
+        olist_orders_dataset[order_purchase_timestamp],
+        olist_orders_dataset[order_delivered_customer_date],
+        DAY
+    )
+)
+
+Delivery Sort = 
+SWITCH(TRUE(),
+    olist_orders_dataset[delay_days] <= -7, 1,
+    olist_orders_dataset[delay_days] <= 0, 2,
+    olist_orders_dataset[delay_days] <= 3, 3,
+    olist_orders_dataset[delay_days] <= 7, 4,
+    olist_orders_dataset[delay_days] <= 14, 5,
+    6
+)
