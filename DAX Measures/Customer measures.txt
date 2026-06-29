@@ -1,0 +1,19 @@
+Repeat Customer Rate = 
+VAR RepeatCustomers = 
+    COUNTROWS(
+        FILTER(
+            SUMMARIZE(
+                olist_customers_dataset,
+                olist_customers_dataset[customer_unique_id],
+                "OrderCount", 
+                DISTINCTCOUNT(olist_orders_dataset[order_id])
+            ),
+            [OrderCount] > 1
+        )
+    )
+VAR TotalCustomers = 
+    DISTINCTCOUNT(
+        olist_customers_dataset[customer_unique_id]
+    )
+RETURN 
+DIVIDE(RepeatCustomers, TotalCustomers) * 100
