@@ -1,0 +1,5 @@
+Total Sellers = 
+DISTINCTCOUNT(olist_order_items_dataset[seller_id])
+
+Avg Revenue per Seller = 
+DIVIDE([Total Revenue], [Total Sellers])
